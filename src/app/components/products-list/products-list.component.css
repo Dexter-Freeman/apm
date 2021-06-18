@@ -1,3 +1,7 @@
 .min-width {
     min-width: 113px;
 }
+
+thead {
+    color: #337AB7
+}
