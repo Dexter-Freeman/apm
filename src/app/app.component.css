@@ -1,0 +1,11 @@
+.navbar-brand {
+    cursor: pointer;
+}
+
+.navbar-brand:hover {
+    text-decoration: none;
+}
+
+.nav-link {
+    font-weight: bold;
+}
