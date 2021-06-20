@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ProductsService } from 'src/app/shared/services/products.service';
 import { IProduct } from './products.interface';
 
@@ -7,12 +8,14 @@ import { IProduct } from './products.interface';
   templateUrl: './products-list.component.html',
   styleUrls: ['./products-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
 
   imageWidth: number = 50;
   imageMargin: number = 2;
   showImage: boolean = true;
   pageTitle: string = 'Product List';
+  errorMessage: string = '';
+  sub!: Subscription;
 
   private _listFilter: string = '';
   get listFilter(): string {
@@ -24,14 +27,26 @@ export class ProductListComponent implements OnInit {
   }
 
   filteredProducts: IProduct[] = [];
-
-  products: IProduct[];
+  // Если в products не присвоить дефолтное значание в виде пустого массива
+  // то в консоли будет ошибка, долго не мог понять почему она появляется
+  // ERROR TypeError: Cannot read property 'length' of undefined
+ //   at ProductListComponent_Template (products-list.component.html:20)
+  products: IProduct[] = [];
 
   constructor( private productsService: ProductsService) { }
 
   ngOnInit(): void {
-    this.products = this.productsService.getProducts();
-    this.filteredProducts = this.products;
+    this.sub = this.productsService.getProducts().subscribe(
+      products => {
+        this.products = products;
+        this.filteredProducts = this.products;
+      },
+      err => this.errorMessage = err
+    )
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   toggleImage(): void {
